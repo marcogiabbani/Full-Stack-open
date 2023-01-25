@@ -1,46 +1,50 @@
-const mongoose = require("mongoose");
+require("dotenv").config();
+const { request, response } = require("express");
+const express = require("express");
+const app = express();
+app.use(express.json());
 
-const password = process.argv[2];
-const name = process.argv[3];
-const number = process.argv[4];
-const url = `mongodb+srv://fullstack:${password}@cluster0.dw5dejb.mongodb.net/noteApp?retryWrites=true&w=majority`;
+const Contact = require("./models/contact");
 
-const contactSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-});
-const Contact = mongoose.model("Contact", contactSchema);
+app.post("/api/contacts", (request, response) => {
+  const body = request.body;
+  console.log(request.body);
 
-if (process.argv.length < 3) {
-  console.log(
-    "Please provide the password as an argument: node mongo.js <password>"
-  );
-  process.exit(1);
-} else if (process.argv.length > 4) {
-  mongoose
-    .connect(url)
-    .then((result) => {
-      console.log("connected");
-      const contact = new Contact({
-        name: name,
-        number: number,
-      });
-      return contact.save();
-    })
-    .then(() => {
-      console.log(`Added ${name} number ${number} to phonebook`);
-      return mongoose.connection.close();
-    })
-    .catch((err) => console.log(err));
-} else {
-  console.log("entre a tercera opcion");
-  mongoose.connect(url).then((result) => {
-    Contact.find({}).then((result) => {
-      console.log("phonebook:");
-      result.forEach((person) => {
-        console.log(`${person.name} ${person.number}`);
-      });
-      return mongoose.connection.close();
-    });
+  if (body.name === undefined) {
+    return response.status(400).json({ error: "body info is missing" });
+  }
+
+  const contact = new Contact({
+    name: body.name,
+    number: body.number,
   });
-}
+
+  contact
+    .save()
+    .then((savedConstact) => {
+      response.json({ savedConstact });
+    })
+    .catch((error) => ("Error while trying to save note", error));
+});
+
+app.get("/api/contacts/:id", (request, response) => {
+  Note.findById(request.params.id)
+    .then((contact) => {
+      response.json(contact);
+    })
+    .catch((error) => ("Error while trying to find contact by id", error));
+});
+
+app.get("/", (request, response) => {
+  response.send("<h1>Hello World!</h1>");
+});
+
+app.get("/api/contacts", (request, response) => {
+  Contact.find({}).then((contact) => {
+    response.json(contact);
+  });
+});
+
+const port = process.env.PORT;
+app.listen(port);
+console.log(`Server running on port ${port}`);
