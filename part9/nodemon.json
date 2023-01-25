@@ -1,0 +1,6 @@
+{
+  "watch": ["src"],
+  "ext": ".ts, .js",
+  "ingore": ["cualquier carpeta que quisieramos ignorar"],
+  "exec": "ts-node ./src/index.ts"
+}
