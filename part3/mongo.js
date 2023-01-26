@@ -6,7 +6,7 @@ app.use(express.json());
 
 const Contact = require("./models/contact");
 
-app.post("/api/contacts", (request, response) => {
+app.post("/api/contacts", (request, response, next) => {
   const body = request.body;
   console.log(request.body);
 
@@ -24,26 +24,51 @@ app.post("/api/contacts", (request, response) => {
     .then((savedConstact) => {
       response.json({ savedConstact });
     })
-    .catch((error) => ("Error while trying to save note", error));
+    .catch(error => next(error))
 });
 
-app.get("/api/contacts/:id", (request, response) => {
-  Note.findById(request.params.id)
-    .then((contact) => {
-      response.json(contact);
+app.delete('/api/contacts/:id', (request, response, next) => {
+  Contact.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
     })
-    .catch((error) => ("Error while trying to find contact by id", error));
-});
+    .catch(error => next(error))
+})
 
-app.get("/", (request, response) => {
-  response.send("<h1>Hello World!</h1>");
-});
-
-app.get("/api/contacts", (request, response) => {
+app.get("/api/contacts", (request, response, next) => {
   Contact.find({}).then((contact) => {
     response.json(contact);
   });
 });
+
+app.get("/api/contacts/:id", (request, response, next) => {
+  Contact.findById(request.params.id)
+    .then((contact) => {
+      response.json(contact);
+    })
+    .catch(error => next(error))
+});
+
+
+app.get("/", (request, response, next) => {
+  response.send("<h1>Hello World!</h1>");
+});
+
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+  console.log(error.name)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id'})
+  }
+
+  next(error)
+}
+
+
+
+app.use(errorHandler)
 
 const port = process.env.PORT;
 app.listen(port);
