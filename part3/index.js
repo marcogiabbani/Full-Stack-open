@@ -37,6 +37,23 @@ app.get("/api/notes/:id", (request, response) => {
     .catch((error) => ("Error while trying to find note by id", error));
 });
 
+app.put("/api/notes/:id", (request, response) => {
+  const body = request.body;
+
+  const note = {
+    content: body.content,
+    important: body.important,
+  };
+
+  Note.findByIdAndUpdate(request.params.id, note, { new: true })
+
+    //aca tengo que actualizar la nota
+    .then((updatedNote) => {
+      response.json(updatedNote);
+    })
+    .catch((error) => ("Error while trying to find note by id", error));
+});
+
 app.get("/", (request, response) => {
   response.send("<h1>Hello World!</h1>");
 });
