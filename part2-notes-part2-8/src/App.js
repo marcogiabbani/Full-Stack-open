@@ -20,11 +20,11 @@ const App = () => {
     event.preventDefault()
     const noteObject = {
       content: newNote,
-      important: Math.random() > 0.5,
+      important: false,
     }
 
     noteService.create(noteObject).then((returnedNote) => {
-      setNotes(notes.concat(returnedNote.savedNote))
+      setNotes(notes.concat(returnedNote))
       setNewNote('')
     })
   }
