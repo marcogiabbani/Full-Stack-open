@@ -7,8 +7,7 @@
     "tsc": "tsc",
     "dev": "ts-node-dev index.ts",
     "lint": "eslint --ext .ts .",
-    "start": "node build/index.js",
-    "prettier-format": "prettier --config .prettierrc 'index.ts' --write"
+    "start": "node build/index.js"
   },
   "author": "marco",
   "license": "ISC",
