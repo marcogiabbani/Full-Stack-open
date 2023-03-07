@@ -6,16 +6,20 @@ notesRouter.get('/', async (request, response) => {
   response.json(notes)
 })
 
-notesRouter.post('/', async (request, response) => {
+notesRouter.post('/', async (request, response, next) => {
   const body = request.body
 
   const note = new Note({
     content: body.content,
     important: body.important || false
   })
+  try {
 
-  const savedNote = await note.save()
-  response.status(201).json(savedNote)
+    const savedNote = await note.save()
+    response.status(201).json(savedNote)
+  } catch(error) {
+    next(error)
+  }
 })
 
 notesRouter.get('/:id', async (request, response) => {
